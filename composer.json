@@ -1,0 +1,13 @@
+{
+    "name": "arif98741/ckfile",
+    "description": "This is a file manager and management application that will give you freedom to manage files easily for a project.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ariful",
+            "email": "arif98741@gmail.com"
+        }
+    ],
+    "require": {}
+}

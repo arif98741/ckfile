@@ -1,9 +1,9 @@
 <?php
 include "App/System.php";
-
+include 'App/Opacity.php';
 use App\System;
+use App\Opacity;
+
 
 $system = new System('file');
-echo '<pre>';
-print_r($system->getDirList('dir1'));
-exit;
+new Opacity($system);

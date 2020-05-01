@@ -7,8 +7,8 @@ namespace App;
 class System
 {
 
-    public $currentDir;
     public $baseDir;
+    public $currentDir;
     public $dirList;
     public $fileList;
     public $dirLog;
@@ -22,6 +22,22 @@ class System
     public function getProperties()
     {
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getBaseDir()
+    {
+        return $this->baseDir;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCurrentDir()
+    {
+        return $this->currentDir;
     }
 
     /**
@@ -51,27 +67,14 @@ class System
     }
 
     /**
-     * @return mixed
-     */
-    public function getBaseDir()
-    {
-        return $this->baseDir;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getCurrentDir()
-    {
-        return $this->currentDir;
-    }
-
-    /**
+     * @param string $path
      * @return mixed
      */
     public function getDirList($path = '/')
     {
         $this->dirLog['path'] = $path;
+        $this->currentDir = $this->baseDir .$path . '/';
+
         if ($path != '/') {
             $newPath = $this->baseDir . '/' . $path;
 
@@ -79,46 +82,58 @@ class System
 
                 $fileList = scandir($newPath);
                 $folders = [];
+                $files = [];
                 foreach ($fileList as $folder) {
 
-                    if (is_dir($this->baseDir . '/' . $path . '/' . $folder)) {
+                    if (is_dir($this->baseDir . '/' . $path . '/' . $folder) && $folder !== '.' && $folder !== '..') {
                         array_push($folders, $folder);
                     }
+
+                    if (is_file($this->baseDir . '/' . $path . '/' . $folder) && $folder !== '.' && $folder !== '..') {
+                        array_push($files, $folder);
+                        $this->fileList = $files;
+                    }
+
                 }
                 $this->dirList = $folders;
-                $this->dirLog['message'] = 'Found ' . count($fileList) . ' files';
+                $this->dirLog['message'] = [
+                    'Found total ' . count($fileList) . $this->formatWord(count($fileList), 'file'),
+                    'Found ' . count($folders) . $this->formatWord(count($folders), 'folder'),
+                    'Found ' . count($files) . $this->formatWord(count($files), 'file'),
+                ];
             } else {
-                $this->dirLog['message'] = 'No file found in directory';
+                return $this->dirLog['message'] = 'No file found in directory';
             }
-            echo '<pre>';
-            print_r($this->dirList);
-            exit;
 
         } else {
             $newPath = $this->baseDir . '/' . $path;
             $fileList = scandir($newPath);
             $folders = [];
             foreach ($fileList as $folder) {
-                if (is_dir($folder)) {
+                if (is_dir($this->baseDir . '/' . $path . '/' . $folder) && $folder !== '.' && $folder !== '..') {
                     array_push($folders, $folder);
                 }
             }
-            $this->dirList = $folders;
+            $this->dirList = $this->escapeDot($folders);
         }
 
-        return $this->dirList;
+        return $this;
+
     }
 
     /**
      * Escape (.) and (..) from File list and return again
-     * @param $files
-     * @return array
+     * @param $size
+     * @param $word
+     * @return string
      */
-    private function escapeDot($files)
+    private function formatWord($size, $word)
     {
-        $files = array_diff($files, array('.', '..'));
-        return $files;
+        if ($size == 1) {
+            return ' ' . $word;
+        } else {
+            return ' ' . $word . 's';
+        }
     }
-
 
 }
